@@ -80,7 +80,9 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
+    # Either provide SPRING_DATASOURCE_URL directly, or supply DB_HOST / DB_PORT / DB_NAME
+    # individually (handy on Render where the managed Postgres exposes those as discrete fields).
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:splitwise}}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver

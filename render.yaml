@@ -1,0 +1,45 @@
+# Render blueprint — one-click deploy backend + managed Postgres.
+# After Render finishes, set APP_FRONTEND_ORIGIN to your Vercel URL
+# (or any other frontend origin) to allow CORS.
+services:
+  - type: web
+    name: splitwise-api
+    runtime: docker
+    plan: free
+    autoDeploy: true
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: JWT_SECRET
+        generateValue: true
+      - key: APP_FRONTEND_ORIGIN
+        sync: false   # set this to https://<your-vercel-app>.vercel.app
+      - key: DB_HOST
+        fromDatabase:
+          name: splitwise-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: splitwise-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: splitwise-db
+          property: database
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: splitwise-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: splitwise-db
+          property: password
+
+databases:
+  - name: splitwise-db
+    plan: free
+    databaseName: splitwise
+    user: splitwise

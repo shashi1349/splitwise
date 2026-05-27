@@ -1,5 +1,6 @@
-# Local-development stack for Splitwise-Lite.
-# Module 1 only includes Postgres; backend and frontend services are added in Module 8.
+# Local development stack: Postgres + backend + frontend.
+# Bring up with `docker compose up --build`. Frontend at http://localhost:5173,
+# backend at http://localhost:8080, Swagger at http://localhost:8080/swagger-ui.html.
 services:
   postgres:
     image: postgres:16-alpine
@@ -17,6 +18,42 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    container_name: splitwise-backend
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: splitwise
+      SPRING_DATASOURCE_USERNAME: splitwise
+      SPRING_DATASOURCE_PASSWORD: splitwise
+      JWT_SECRET: dev-only-please-change-this-32-byte-minimum-secret-locally-only
+      APP_FRONTEND_ORIGIN: http://localhost:5173
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:8080
+    container_name: splitwise-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
 
 volumes:
   splitwise_postgres_data:
