@@ -1,6 +1,19 @@
-# Render blueprint — one-click deploy backend + managed Postgres.
-# After Render finishes, set APP_FRONTEND_ORIGIN to your Vercel URL
-# (or any other frontend origin) to allow CORS.
+# Render blueprint — backend (Docker) + managed Postgres.
+#
+# IMPORTANT (free tier): Render's free PostgreSQL only exposes an
+# *external* endpoint (host name ends in `.<region>-postgres.render.com`).
+# The `fromDatabase: host` and `fromDatabase: connectionString`
+# properties return the *internal* short host, which a free web service
+# can't resolve — you'll see `UnknownHostException: dpg-xxxx-a` at boot.
+#
+# Workaround that works on free *and* paid tiers: leave the JDBC
+# connection vars as `sync: false` here, then fill them in manually
+# from the database's "External Database URL" once Render finishes
+# provisioning. Step-by-step is in DEPLOYMENT.md §2.
+#
+# If you upgrade the Postgres plan to anything paid, you can replace
+# the three sync:false entries with the commented `fromDatabase` lines
+# and the internal hostname will resolve correctly.
 services:
   - type: web
     name: splitwise-api
@@ -16,27 +29,24 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: APP_FRONTEND_ORIGIN
-        sync: false   # set this to https://<your-vercel-app>.vercel.app
-      - key: DB_HOST
-        fromDatabase:
-          name: splitwise-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: splitwise-db
-          property: port
-      - key: DB_NAME
-        fromDatabase:
-          name: splitwise-db
-          property: database
+        sync: false   # set to your Vercel URL (e.g. https://splitwise-lite.vercel.app)
+      - key: SPRING_DATASOURCE_URL
+        sync: false   # jdbc:postgresql://<external-host>:5432/<db>?sslmode=require
       - key: SPRING_DATASOURCE_USERNAME
-        fromDatabase:
-          name: splitwise-db
-          property: user
+        sync: false   # from the External Database URL
       - key: SPRING_DATASOURCE_PASSWORD
-        fromDatabase:
-          name: splitwise-db
-          property: password
+        sync: false   # from the External Database URL
+        # ---- Paid-tier alternative (uncomment if you upgrade) ----
+        # - key: DB_HOST
+        #   fromDatabase: { name: splitwise-db, property: host }
+        # - key: DB_PORT
+        #   fromDatabase: { name: splitwise-db, property: port }
+        # - key: DB_NAME
+        #   fromDatabase: { name: splitwise-db, property: database }
+        # - key: SPRING_DATASOURCE_USERNAME
+        #   fromDatabase: { name: splitwise-db, property: user }
+        # - key: SPRING_DATASOURCE_PASSWORD
+        #   fromDatabase: { name: splitwise-db, property: password }
 
 databases:
   - name: splitwise-db
