@@ -3,7 +3,10 @@ import LoginPage from '@/auth/LoginPage';
 import RegisterPage from '@/auth/RegisterPage';
 import RequireAuth from '@/auth/RequireAuth';
 import AppShell from '@/components/AppShell';
-import HomePage from '@/pages/HomePage';
+import GroupsPage from '@/features/groups/GroupsPage';
+import GroupDetailPage from '@/features/groups/GroupDetailPage';
+import MembersTab from '@/features/groups/MembersTab';
+import PlaceholderTab from '@/features/groups/PlaceholderTab';
 
 export default function AppRoutes() {
   return (
@@ -12,7 +15,24 @@ export default function AppRoutes() {
       <Route path="/register" element={<RegisterPage />} />
       <Route element={<RequireAuth />}>
         <Route element={<AppShell />}>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<Navigate to="/groups" replace />} />
+          <Route path="/groups" element={<GroupsPage />} />
+          <Route path="/groups/:groupId" element={<GroupDetailPage />}>
+            <Route index element={<Navigate to="expenses" replace />} />
+            <Route
+              path="expenses"
+              element={<PlaceholderTab module="Module 4" feature="Expenses" />}
+            />
+            <Route
+              path="balances"
+              element={<PlaceholderTab module="Module 5" feature="Balances" />}
+            />
+            <Route
+              path="settle"
+              element={<PlaceholderTab module="Module 6" feature="Settle-up suggestions" />}
+            />
+            <Route path="members" element={<MembersTab />} />
+          </Route>
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
