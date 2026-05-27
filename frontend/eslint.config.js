@@ -29,4 +29,12 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Test files: relax the fast-refresh rule (it's pointless for tests
+    // and helpers that mix component + non-component exports).
+    files: ['**/*.test.{ts,tsx}', 'src/test/**/*.{ts,tsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 );
