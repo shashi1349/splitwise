@@ -7,6 +7,7 @@ import GroupsPage from '@/features/groups/GroupsPage';
 import GroupDetailPage from '@/features/groups/GroupDetailPage';
 import MembersTab from '@/features/groups/MembersTab';
 import PlaceholderTab from '@/features/groups/PlaceholderTab';
+import ExpensesTab from '@/features/expenses/ExpensesTab';
 
 export default function AppRoutes() {
   return (
@@ -19,10 +20,7 @@ export default function AppRoutes() {
           <Route path="/groups" element={<GroupsPage />} />
           <Route path="/groups/:groupId" element={<GroupDetailPage />}>
             <Route index element={<Navigate to="expenses" replace />} />
-            <Route
-              path="expenses"
-              element={<PlaceholderTab module="Module 4" feature="Expenses" />}
-            />
+            <Route path="expenses" element={<ExpensesTab />} />
             <Route
               path="balances"
               element={<PlaceholderTab module="Module 5" feature="Balances" />}
