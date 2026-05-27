@@ -88,10 +88,9 @@ docker compose up --build
 
 | What        | Where                                       |
 | ----------- | ------------------------------------------- |
-| Frontend    | <http://localhost:5173>                     |
-| Backend API | <http://localhost:8080>                     |
-| Swagger UI  | <http://localhost:8080/swagger-ui.html>     |
-| Health      | <http://localhost:8080/actuator/health>     |
+| Frontend    | https://splitwise-omega-blue.vercel.app/    |
+| Backend API | https://splitwise-m0fx.onrender.com         |
+
 
 ### Native (no Docker)
 
