@@ -62,3 +62,13 @@ export function formatPercentHundredths(hundredths: number): string {
   const frac = (abs % 100).toString().padStart(2, '0');
   return `${sign}${whole}.${frac}`;
 }
+
+/** Convert integer cents to a "1234.56" string (no currency symbol),
+ *  suitable for sending as the {@code amount} field on a request body. */
+export function centsToDecimalString(cents: number): string {
+  const sign = cents < 0 ? '-' : '';
+  const abs = Math.abs(Math.trunc(cents));
+  const whole = Math.trunc(abs / 100);
+  const frac = (abs % 100).toString().padStart(2, '0');
+  return `${sign}${whole}.${frac}`;
+}

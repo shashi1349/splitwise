@@ -6,9 +6,9 @@ import AppShell from '@/components/AppShell';
 import GroupsPage from '@/features/groups/GroupsPage';
 import GroupDetailPage from '@/features/groups/GroupDetailPage';
 import MembersTab from '@/features/groups/MembersTab';
-import PlaceholderTab from '@/features/groups/PlaceholderTab';
 import ExpensesTab from '@/features/expenses/ExpensesTab';
 import BalancesTab from '@/features/balances/BalancesTab';
+import SettleUpTab from '@/features/settlements/SettleUpTab';
 
 export default function AppRoutes() {
   return (
@@ -28,7 +28,7 @@ export default function AppRoutes() {
             />
             <Route
               path="settle"
-              element={<PlaceholderTab module="Module 6" feature="Settle-up suggestions" />}
+              element={<SettleUpTab />}
             />
             <Route path="members" element={<MembersTab />} />
           </Route>
