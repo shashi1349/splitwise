@@ -1,0 +1,22 @@
+# Local-development stack for Splitwise-Lite.
+# Module 1 only includes Postgres; backend and frontend services are added in Module 8.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: splitwise-postgres
+    environment:
+      POSTGRES_DB: splitwise
+      POSTGRES_USER: splitwise
+      POSTGRES_PASSWORD: splitwise
+    ports:
+      - "5432:5432"
+    volumes:
+      - splitwise_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U splitwise -d splitwise"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  splitwise_postgres_data:
