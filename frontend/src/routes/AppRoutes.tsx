@@ -8,6 +8,7 @@ import GroupDetailPage from '@/features/groups/GroupDetailPage';
 import MembersTab from '@/features/groups/MembersTab';
 import PlaceholderTab from '@/features/groups/PlaceholderTab';
 import ExpensesTab from '@/features/expenses/ExpensesTab';
+import BalancesTab from '@/features/balances/BalancesTab';
 
 export default function AppRoutes() {
   return (
@@ -23,7 +24,7 @@ export default function AppRoutes() {
             <Route path="expenses" element={<ExpensesTab />} />
             <Route
               path="balances"
-              element={<PlaceholderTab module="Module 5" feature="Balances" />}
+              element={<BalancesTab />}
             />
             <Route
               path="settle"
