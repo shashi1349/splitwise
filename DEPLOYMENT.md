@@ -56,17 +56,35 @@ Stop with `docker compose down` (or `down -v` to wipe the database).
 
 ### 2.2 — Wire the database into the web service
 
-1. Render → **splitwise-db** → **Info** tab. Copy the **External Database URL**:
-   ```
-   postgres://splitwise:LONG_PASSWORD@dpg-XXXXXXXX-a.<region>-postgres.render.com/splitwise
-   ```
+1. Render → **splitwise-db** → **Info** tab. **Don't parse the URL** —
+   Render shows the four fields you need explicitly. Note them down:
+
+   | Render field   | What it is                                              |
+   | -------------- | ------------------------------------------------------- |
+   | **Hostname**   | external host, ends in `.<region>-postgres.render.com`  |
+   | **Port**       | `5432`                                                  |
+   | **Database**   | actual db name (often has a random suffix — copy verbatim) |
+   | **Username**   | actual db user (often has a random suffix too)          |
+   | **Password**   | click the eye icon to reveal                            |
+
+   Render reserves the right to append suffixes to `databaseName` and
+   `user` from `render.yaml` to avoid name collisions; in particular,
+   after you click **Reset** on the database the new name almost always
+   has a suffix. The values shown on this tab are authoritative.
+
 2. Render → **splitwise-api** → **Environment** tab. Set:
 
    | Key                          | Value                                                                                                |
    | ---------------------------- | ---------------------------------------------------------------------------------------------------- |
-   | `SPRING_DATASOURCE_URL`      | `jdbc:postgresql://dpg-XXXXXXXX-a.<region>-postgres.render.com:5432/splitwise?sslmode=require`       |
-   | `SPRING_DATASOURCE_USERNAME` | `splitwise` (the user portion of the URL)                                                            |
-   | `SPRING_DATASOURCE_PASSWORD` | `LONG_PASSWORD` (the password portion of the URL)                                                    |
+   | `SPRING_DATASOURCE_URL`      | `jdbc:postgresql://<Hostname>:<Port>/<Database>?sslmode=require`                                     |
+   | `SPRING_DATASOURCE_USERNAME` | exact value from **Username** above                                                                  |
+   | `SPRING_DATASOURCE_PASSWORD` | exact value from **Password** above                                                                  |
+
+   Concrete example:
+
+   ```
+   SPRING_DATASOURCE_URL = jdbc:postgresql://dpg-XXXXXXXX-a.oregon-postgres.render.com:5432/splitwise_abc1?sslmode=require
+   ```
 
    The `?sslmode=require` part matters: Render's Postgres demands TLS
    even on the external endpoint, so the JDBC driver must negotiate it.
@@ -161,8 +179,28 @@ Fix: paste the **External** Database URL into `SPRING_DATASOURCE_URL`
 ### `password authentication failed for user "splitwise"`
 
 The password you pasted into `SPRING_DATASOURCE_PASSWORD` doesn't match
-the DB. Re-copy it from the External Database URL — Render rotates it
-if you click **Reset** on the database.
+the DB *or* the username doesn't match what Render actually created
+(Render often appends a suffix). Re-copy both **Username** and
+**Password** from the splitwise-db Info tab. They get rotated whenever
+you click **Reset** on the database.
+
+### `FATAL: database "splitwise" does not exist`
+
+You connected successfully but the database name in the JDBC URL path
+is wrong. Open splitwise-db Info, look at the **Database** field
+explicitly (do not parse the External URL — copy from the field), and
+put exactly that value after the last `/` in `SPRING_DATASOURCE_URL`.
+Render frequently appends a suffix (`splitwise_abc1`) even when
+`render.yaml` requested a clean name. As a last resort, create the
+missing database manually:
+
+```bash
+psql "postgres://<USER>:<PASS>@<HOST>/postgres?sslmode=require" \
+  -c 'CREATE DATABASE splitwise;'
+```
+
+(Connect to the always-present `postgres` system database, then issue
+`CREATE DATABASE`.)
 
 ### `No open ports detected, continuing to scan...`
 
