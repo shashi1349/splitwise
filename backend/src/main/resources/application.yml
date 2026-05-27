@@ -14,6 +14,8 @@ spring:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
+    connect-retries: 3
+    connect-retries-interval: 5
 
 server:
   port: ${PORT:8080}
@@ -86,5 +88,13 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      # Keep the pool small on free-tier hosts (Render's free web service is 0.1 CPU / 512 MB).
+      # The TLS handshake to a remote managed Postgres takes ~1-2 s, so creating ten connections
+      # at startup blew through Render's port-bind deadline.
+      minimum-idle: 1
+      maximum-pool-size: 5
+      connection-timeout: 30000
+      initialization-fail-timeout: 60000
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
